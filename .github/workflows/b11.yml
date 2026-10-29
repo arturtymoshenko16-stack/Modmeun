@@ -1,0 +1,23 @@
+name: v11
+on: push
+jobs:
+  b:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: unzip -q ./*.zip -d src
+      - run: |
+          F=$(ls src/*/app/src/main/cpp/main.cpp)
+          sed -i '/#define LOGI/a static std::mutex gFeatureMutex;\nstatic std::unordered_map<int, bool> gFeatureStates;' "$F"
+          sed -i "s|iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQ[A-Za-z0-9+/=]*|iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAABJklEQVR42u3bwQ0AEAxAUTtbwFriYBFWsAJL6EE8yV+geaemUspt6+MMAQBDAEAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAPoNQB9LAT0DwIt5AAAAAAAAAAAAAAAAAAAAAABgEWQRZBUsAASAABAAAkAACAABIAAEgAAQAAJA7gHcAwAAAAAAAAAAAAAAAAAAAAAAAAAA3KzUqYCsggWAABAAAkAACAABIAAEgAAQAAJAAMg9gHsAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AvwLsAoWAAJAAAgAAAwBAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAANATHcuami3I1TPjAAAAAElFTkSuQmCC|" "$F"
+          sed -i 's|"Button_Check IL2CPP status"|"Button_Check IL2CPP status",\n"Button_Btn 1",\n"Button_Btn 2",\n"Button_Btn 3",\n"Button_Btn 4",\n"Button_Btn 5",\n"Collapse_Slider",\n"CollapseAdd_SeekBar_Value_1_100"|' "$F"
+          grep -rl "HACK 3.0" src/*/app/src/main | xargs sed -i 's/ HACK 3\.0//g'
+          sed -i "s/'arm64-v8a'/'arm64-v8a','armeabi-v7a'/;s/minSdk 23/minSdk 21/" src/*/app/build.gradle
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: |
+          M=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+          yes | $M --licenses >/dev/null || true
+          $M "platforms;android-34" "cmake;3.22.1" "nd
