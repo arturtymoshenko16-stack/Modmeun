@@ -1,0 +1,16 @@
+name: Build v10
+on:
+  workflow_dispatch:
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: unzip -q ./*.zip -d src
+      - name: Fix sources
+        run: |
+          F=$(ls src/*/app/src/main/cpp/main.cpp)
+          sed -i '/#define LOGI/a static std::mutex gFeatureMutex;\nstatic std::unordered_map<int, bool> gFeatureStates;' "$F"
+          sed -i "s|iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQ[A-Za-z0-9+/=]*|iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAABJklEQVR42u3bwQ0AEAxAUTtbwFriYBFWsAJL6EE8yV+geaemUspt6+MMAQBDAEAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAPoNQB9LAT0DwIt5AAAAAAAAAAAAAAAAAAAAAABgEWQRZBUsAASAABAAAkAACAABIAAEgAAQAAJA7gHcAwAAAAAAAAAAAAAAAAAAAAAAAAAA3KzUqYCsggWAABAAAkAACAABIAAEgAAQAAJAAMg9gHsAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AvwLsAoWAAJAAAgAAAwBAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAANATHcuami3I1TPjAAAAAElFTkSuQmCC|" "$F"
+          sed -i 's|"Button_Check IL2CPP status"|"Button_Check IL2CPP status",\n"Button_Кнопка 1",\n"Button_Кнопка 2",\n"Button_Кнопка 3",\n"Button_Кнопка 4",\n"Button_Кнопка 5",\n"Collapse_Slider",\n"CollapseAdd_SeekBar_Value_1_100"|' %2
